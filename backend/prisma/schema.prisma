@@ -1,0 +1,53 @@
+// Configuration de la base de données
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+}
+
+// Génération du client Prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Modèle Utilisateur
+model Utilisateur {
+  id          Int         @id @default(autoincrement())
+  nom         String
+  email       String      @unique
+  motDePasse  String
+  role        Role        @default(CLIENT)
+  decodeurs   Decodeur[]
+  operations  Operation[] // si tu veux traquer l'auteur de l’opération
+}
+
+// Modèle Décodeur
+model Decodeur {
+  id           Int         @id @default(autoincrement())
+  adresseIp    String      @unique
+  model        String?
+  chaines      String[]
+  clientId     Int?
+  client       Utilisateur? @relation(fields: [clientId], references: [id])
+  etat         String      @default("ACTIF") // ACTIF, INACTIF
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  operations   Operation[]
+}
+
+// Modèle Operation
+model Operation {
+  id            Int        @id @default(autoincrement())
+  type          String     // REDEMARRAGE, REINITIALISATION, EXTINCTION, AJOUT_CHAINE, RETRAIT_CHAINE
+  createdAt     DateTime   @default(now())
+  decodeurId    Int
+  decodeur      Decodeur   @relation(fields: [decodeurId], references: [id])
+  utilisateurId Int?
+  utilisateur   Utilisateur? @relation(fields: [utilisateurId], references: [id])
+}
+
+// Enumération des rôles
+enum Role {
+  ADMIN
+  CLIENT
+}
