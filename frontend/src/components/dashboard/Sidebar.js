@@ -5,49 +5,55 @@ const Sidebar = ({ user, onLogout }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-      onLogout();
-      navigate('/auth');
+        onLogout();
+        navigate('/auth');
     };
 
-  return React.createElement('div', { className: 'sidebar' },
-    React.createElement('div', { className: 'sidebar-header name_logo'  },
-      React.createElement('h3', null, 'Decoder System')
-    ),
-    React.createElement('nav', { className: 'sidebar-nav' },
-      React.createElement('ul', { className: 'nav flex-column' },
-        React.createElement('li', { className: 'nav-item lists' },
-          React.createElement(NavLink, {
-            to: '/dashboard/decoders',
-            className: 'nav-link listsa',
-            activeClassName: 'active'
-          }, 
-            React.createElement('i', { className: 'fas fa-satellite-dish mr-2 ' }),
-            'Decoders'
-          )
-        ),
-        user.role === 'ADMIN' &&
-          React.createElement('li', { className: 'nav-item lists' },
-            React.createElement(NavLink, {
-              to: '/dashboard/clients',
-              className: 'nav-link listsa ',
-              activeClassName: 'active'
-            },
-              React.createElement('i', { className: 'fas fa-users l-5 ' }),
-              'Clients'
-            )
-          )
-      )
-    ),
-    React.createElement('div', { className: 'sidebar-footer' },
-      React.createElement('button', {
-        className: 'btn btn-danger btn-block logoutB',
-        onClick: handleLogout
-      },
-        React.createElement('i', { className: 'fas fa-sign-out-alt mr-2 ' }),
-        'Logout'
-      )
-    )
-  );
+    return (
+        <div className="sidebar">
+            <div className="sidebar-header name_logo">
+                <h3>Decoder System</h3>
+            </div>
+            
+            <nav className="sidebar-nav">
+                <ul className="nav flex-column">
+                    <li className="nav-item lists">
+                        <NavLink 
+                            to="/dashboard/decoders" 
+                            className="nav-link listsa" 
+                            activeClassName="active"
+                        >
+                            <i className="fas fa-satellite-dish mr-2"></i>
+                            Decoders
+                        </NavLink>
+                    </li>
+                    
+                    {user.role === 'ADMIN' && (
+                        <li className="nav-item lists">
+                            <NavLink 
+                                to="/dashboard/clients" 
+                                className="nav-link listsa" 
+                                activeClassName="active"
+                            >
+                                <i className="fas fa-users l-5"></i>
+                                Clients
+                            </NavLink>
+                        </li>
+                    )}
+                </ul>
+            </nav>
+            
+            <div className="sidebar-footer">
+                <button 
+                    className="btn btn-danger btn-block logoutB" 
+                    onClick={handleLogout}
+                >
+                    <i className="fas fa-sign-out-alt mr-2"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    );
 };
 
 export default Sidebar;

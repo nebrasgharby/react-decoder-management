@@ -7,8 +7,6 @@ exports.login = async (req, res) => {
   
   try {
     // Validate email format
-    
-
     const user = await prisma.utilisateur.findUnique({ where: { email } });
     
     // Check if user exists
@@ -32,7 +30,9 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       {
         userId: user.id,
-        role: user.role
+        role: user.role,
+        name:user.nom
+
       },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }

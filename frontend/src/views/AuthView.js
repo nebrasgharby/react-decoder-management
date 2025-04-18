@@ -43,23 +43,30 @@ const AuthView = ({ onLogin }) => {
     }
   };
 
-  return React.createElement('div', { className: 'auth-container' },
-    React.createElement('div', { className: 'auth-card slide-in' },
-      React.createElement('div', { className: 'card-header text-center' },
-        React.createElement('h2', null, 'Decoder Management System')
-      ),
-      React.createElement('div', { className: 'card-body' },
-        error && React.createElement('div', { 
-          className: 'alert alert-danger',
-          style: { color: 'red' } 
-        }, error),
-        React.createElement(Login, { 
-          onSubmit: handleSubmit, 
-          loading: loading,
-          fieldErrors: fieldErrors
-        })
-      )
-    )
+  return (
+    <div className="auth-container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="auth-card slide-in card shadow-lg" style={{ width: '100%', maxWidth: '450px' }}>
+        <div className="card-header bg-primary text-white text-center py-3">
+          <h2 className="m-0">
+            <i className="fas fa-satellite-dish me-2"></i>
+            Decoder Management System
+          </h2>
+        </div>
+        <div className="card-body p-4">
+          {error && (
+            <div className="alert alert-danger mb-4">
+              <i className="fas fa-exclamation-circle me-2"></i>
+              {error}
+            </div>
+          )}
+          <Login 
+            onSubmit={handleSubmit} 
+            loading={loading}
+            fieldErrors={fieldErrors}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

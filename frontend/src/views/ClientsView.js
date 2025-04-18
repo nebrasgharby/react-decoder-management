@@ -8,10 +8,11 @@ const ClientsView = () => {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     fetchClients();
-  }, []);
+  }, [refreshTrigger]); // Add refreshTrigger as dependency
 
   const fetchClients = async () => {
     setLoading(true);
@@ -29,7 +30,7 @@ const ClientsView = () => {
     try {
       await createClient(clientData);
       setShowForm(false);
-      fetchClients();
+      setRefreshTrigger(prev => prev + 1); // This will trigger the useEffect
     } catch (err) {
       setError(err.message);
     }
@@ -39,32 +40,51 @@ const ClientsView = () => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
         await deleteClient(id);
-        fetchClients();
+        setRefreshTrigger(prev => prev + 1); // This will trigger the useEffect
       } catch (err) {
         setError(err.message);
       }
     }
   };
 
-  return React.createElement('div', { className: 'slide-in' },
-    React.createElement('div', { className: 'd-flex justify-content-between mb-4' },
-      React.createElement('h2', null, 'Clients Management'),
-      React.createElement('button', {
-        className: 'btn btn-primary',
-        onClick: () => setShowForm(true)
-      }, 'Add Client')
-    ),
-    error && React.createElement('div', { className: 'alert alert-danger' }, error),
-    showForm &&
-      React.createElement(ClientForm, {
-        onSubmit: handleCreate,
-        onCancel: () => setShowForm(false)
-      }),
-    React.createElement(ClientList, {
-      clients: clients,
-      onDelete: handleDelete,
-      loading: loading
-    })
+  return (
+    <div className="slide-in">
+      <div className="d-flex justify-content-between mb-4">
+        <h2>Clients Management</h2>
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowForm(true)}
+          disabled={loading}
+        >
+          Add Client
+        </button>
+      </div>
+
+      {error && (
+        <div className="alert alert-danger">
+          {error}
+          <button 
+            type="button" 
+            className="btn-close" 
+            onClick={() => setError(null)}
+          />
+        </div>
+      )}
+
+      {showForm && (
+        <ClientForm
+          onSubmit={handleCreate}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
+
+      <ClientList
+        clients={clients}
+        onDelete={handleDelete}
+        loading={loading}
+        refreshTrigger={refreshTrigger}
+      />
+    </div>
   );
 };
 

@@ -16,7 +16,7 @@ import { useAuth } from '../../context/AuthContext';
 import { decodeToken } from '../../utils/auth';
 import { BiTrash, BiInfoCircle,  BiPowerOff, BiReset, BiArrowBack } from 'react-icons/bi';
 
-const ClientsList = () => {
+const ClientsList = ({refreshTrigger}) => {
   const { user } = useAuth();
   const [currentRole, setCurrentRole] = useState(null);
   const [clients, setClients] = useState([]);
@@ -30,6 +30,7 @@ const ClientsList = () => {
   const [channelName, setChannelName] = useState('');
   const [currentDecoder, setCurrentDecoder] = useState(null);
   const [showChannels, setShowChannels] = useState({});
+  const [currentUserId, setCurrentUserId] = useState(null);
 
   const toggleChannels = (decoderId) => {
     setShowChannels(prev => ({
@@ -43,6 +44,7 @@ const ClientsList = () => {
       try {
         setLoading(true);
         setError(null);
+        console.log(user);
         
         const response = await Promise.all([
           getClients(),
@@ -56,9 +58,12 @@ const ClientsList = () => {
           if (token) {
             const decoded = decodeToken(token);
             setCurrentRole(decoded?.role);
+            setCurrentUserId(decoded?.userId);
+            console.log(decoded);
+            
           }
         }
-
+        
         setClients(response[0] || []);
         setDecoders(response[1] || []);
       } catch (err) {
@@ -69,7 +74,7 @@ const ClientsList = () => {
     };
     
     fetchData();
-  }, [user]);
+  }, [user,refreshTrigger]);
 
   const handleDeleteClient = async (clientId) => {
     if (!window.confirm('Are you sure you want to delete this client?')) return;
@@ -235,17 +240,8 @@ const ClientsList = () => {
 
   return (
     <div className="container-fluid p-4">
-      <div className="card mb-4">
-        <div className="card-body">
-          <h1 className="mb-0">Dashboard</h1>
-          <p className="text-muted">Welcome, {currentRole}</p>
-        </div>
-      </div>
 
       <div className="card">
-        <div className="card-header bg-primary text-white">
-          <h2 className="mb-0">Clients Management</h2>
-        </div>
         
         <div className="card-body">
           {error && (
@@ -402,14 +398,16 @@ const ClientsList = () => {
                               {selectedClient === client.id ? 'Hide' : 'Show'}
                             </button>
                             
-                            <button
-                              className="btn btn-sm btn-danger ms-2"
-                              onClick={() => handleDeleteClient(client.id)}
-                              disabled={loading}
-                              title="Delete client"
-                            >
-                              <BiTrash className="me-1" /> Delete
-                            </button>
+                            {currentUserId !== client.id && (
+  <button
+    className="btn btn-sm btn-danger ms-2"
+    onClick={() => handleDeleteClient(client.id)}
+    disabled={loading}
+    title="Delete client"
+  >
+    <BiTrash className="me-1" /> Delete
+  </button>
+)}
                           </div>
                         </td>
                       </tr>
